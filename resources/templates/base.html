@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to seminar</title>
+
+    <!-- styles -->
+    {% style "/css/bootstrap.min.css" %}
+    {% style "/css/font-awesome.min.css" %}
+
+    {% style "/css/screen.css" %}
+
+    {% for item in add-css %}
+       <link href="{{item}}" rel="stylesheet" type="text/css" />
+    {% endfor %}
+    
+  </head>
+  <body>
+      <!-- navbar -->
+      <nav class="navbar navbar-dark bg-primary" role="navigation">
+          <button class="navbar-toggler hidden-sm-up"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target="#collapsing-navbar">
+              &#9776;
+          </button>
+          <div class="collapse navbar-toggleable-xs" id="collapsing-navbar">
+              <a class="navbar-brand" href="{{servlet-context}}/">seminar</a>
+              <ul class="nav navbar-nav">
+                  <li class="nav-item">
+                      <a href="{{servlet-context}}/"
+                         class="nav-link{% ifequal page "home.html" %} active{%endifequal%}">
+                      home
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{{servlet-context}}/about"
+                         class="nav-link{% ifequal page "about.html" %} active{%endifequal%}">
+                      about
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </nav>
+
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+
+    <!-- scripts -->
+    {% script "/js/jquery.min.js" %}
+    {% script "/js/tether.min.js" %}
+    {% script "/js/bootstrap.min.js" %}
+    {% for item in add-js %}
+    <script src="{{item}}" type="text/javascript"></script>
+    {% endfor %}
+
+    <script type="text/javascript">
+      var context = "{{servlet-context}}";
+    </script>
+    {% block page-scripts %}
+    {% endblock %}
+  </body>
+</html>
