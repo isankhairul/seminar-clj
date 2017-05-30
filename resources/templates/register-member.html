@@ -48,8 +48,8 @@
         </div>
 
         <div class="md-form">
-            <input type="date" name="dob" id="dob" class="form-control validate">
-            <label for="dob" data-error="input_date" data-success="right"></label>
+            <input type="text" name="dob" id="dob" class="form-control datepicker">
+            <label for="dob">Date of birth</label>
         </div>
         <div class="file-field">
             <div class="btn btn-primary btn-sm">
@@ -118,6 +118,12 @@
 <script>
  $(document).ready(function() {
     $('.mdb-select').material_select();
+    // Data Picker Initialization
+    $('.datepicker').pickadate({
+        selectYears: 100,
+        max: true,
+        formatSubmit: 'yyyy-mm-dd'
+    });
 
     $('#signup').on('click', function(){
         $('#modalSignup').modal({backdrop: 'static'});

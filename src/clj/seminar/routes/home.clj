@@ -18,5 +18,5 @@
   (GET "/register-member" [] (layout/render "register-member.html"))
   (GET "/list-member" [] (layout/render "list-member.html"))
   (GET "/order-seminar" [] (layout/render "order-seminar.html"))
-  (GET "/history-order" [] "history-order"))
+  (GET "/history-order" [] (layout/render "history-order.html")))
 
