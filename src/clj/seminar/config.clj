@@ -8,3 +8,10 @@
                        [(args)
                         (source/from-system-props)
                         (source/from-env)]))
+
+
+(def credentials
+  (->> "credentials.edn"
+       clojure.java.io/resource
+       slurp
+       read-string))

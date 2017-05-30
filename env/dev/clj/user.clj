@@ -3,10 +3,10 @@
             seminar.core))
 
 (defn start []
-  (mount/start-without #'seminar.core/repl-server))
+  (mount/start-without #'seminar.core/nrepl-server))
 
 (defn stop []
-  (mount/stop-except #'seminar.core/repl-server))
+  (mount/stop-except #'seminar.core/nrepl-server))
 
 (defn restart []
   (stop)

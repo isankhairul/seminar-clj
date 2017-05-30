@@ -14,5 +14,9 @@
 
 (defroutes home-routes
   (GET "/" [] (home-page))
-  (GET "/about" [] (about-page)))
+  (GET "/about" [] (about-page))
+  (GET "/register-member" [] (layout/render "register-member.html"))
+  (GET "/list-member" [] (layout/render "list-member.html"))
+  (GET "/order-seminar" [] (layout/render "order-seminar.html"))
+  (GET "/history-order" [] "history-order"))
 

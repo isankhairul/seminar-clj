@@ -1,0 +1,117 @@
+{% extends "base.html" %} {% block content %}
+
+<br/>
+<div class="row">
+
+    <!--Header-->
+    <div class="text-left">
+        <h3>List Member</h3>
+    </div>
+    <hr class="mt-2 mb-2">
+    <br/> <br/> <br/>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tema</th>
+                <th>Jadwal</th>
+                <th>Pembicara</th>
+                <th>Tempat</th>
+                <th>Kuota</th>
+                <th>Sisa Kuota</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Mobile Application</td>
+                <td>2017-07-20 09:00:00</td>
+                <td>Harianto</td>
+                <td>Auditorium Mercu Buana</td>
+                <td>50</td>
+                <td>49</td>
+                <td>Active</td>
+                <td>
+                    <button type="button" data-toggle="modal" data-target="#modalOrder" class="btn btn-order warning-color-dark waves-effect">Order</button>
+                </td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>IT Security</td>
+                <td>2017-07-20 08:00:00</td>
+                <td>Budi</td>
+                <td>Auditorium Mercu Buana</td>
+                <td>100</td>
+                <td>98</td>
+                <td>Active</td>
+                <td>
+                    <button type="button" data-toggle="modal" data-target="#modalOrder" class="btn btn-order warning-color-dark waves-effect">Order</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Central Modal Medium Info -->
+<div id="modalOrder" class="modal fade" id="centralModalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-notify modal-info" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header info-color">
+                <p class="heading lead">Order Seminar : Mobile Application</p>
+
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="white-text">&times;</span>
+                </button>-->
+            </div>
+
+            <!--Body-->
+            <div class="modal-body">
+                <div id="progress-order" style="display:none;">
+                    <div class="text-center">
+                        <div class="progress info-color">
+                            <div class="indeterminate"></div>
+                        </div>
+                        <p>Mohon tunggu data register anda sedang kami proses.</p>
+                    </div>
+                </div>
+                
+                <div id="form-order">
+                    <!--Form with header-->
+                    <div class="card ">
+                        <div class="card-block">
+                            <!--Body-->
+                            <div class="md-form">
+                                <input name="" type="email" id="email" class="form-control validate">
+                                <label for="email" data-error="input_valid_email">Email</label>
+                            </div>
+                            <div class="text-left">
+                                <button class="btn btn-deep-purple">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/Form with header-->
+                </div>
+                <div id="result-order" style="display:block;">
+                     <br/>
+                    <div class="alert alert-success">
+                        Berhasil Order, <br/>
+                        Serial Number : ABC123
+                    </div>
+                </div>
+                <hr/>
+                <div id="modal-button-close" class="text-right">
+                    <a type="button" class="btn warning-color-dark waves-effect" data-dismiss="modal">Close</a>
+                </div>
+            </div>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+<!-- Central Modal Medium Info-->
+
+{% endblock %}

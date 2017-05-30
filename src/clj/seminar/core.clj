@@ -1,6 +1,7 @@
 (ns seminar.core
   (:require [seminar.handler :as handler]
-            [luminus.repl-server :as repl]
+            [cider.nrepl :refer (cider-nrepl-handler)]
+            [clojure.tools.nrepl.server :as nrepl-server]
             [luminus.http-server :as http]
             [seminar.config :refer [env]]
             [clojure.tools.cli :refer [parse-opts]]
@@ -23,13 +24,18 @@
                 (http/stop http-server))
 
 (mount/defstate ^{:on-reload :noop}
-                repl-server
-                :start
-                (when-let [nrepl-port (env :nrepl-port)]
-                  (repl/start {:port nrepl-port}))
-                :stop
-                (when repl-server
-                  (repl/stop repl-server)))
+  nrepl-server
+  :start
+  (when-let [nrepl-port (env :nrepl-port)]
+    (nrepl-server/start-server :port nrepl-port
+                               :handler (apply nrepl-server/default-handler
+                                               (map resolve
+                                                    (remove #{'cider.nrepl.middleware.out/wrap-out}
+                                                            cider.nrepl/cider-middleware)))
+                               :bind "0.0.0.0"))
+  :stop
+  (when nrepl-server
+    (nrepl-server/stop-server nrepl-server)))
 
 
 (defn stop-app []
