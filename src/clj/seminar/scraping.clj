@@ -1,6 +1,6 @@
 (ns seminar.scraping
   (:require [clojure.tools.logging :as log]
-            [myapp.util :as u]
+            [seminar.util :as u]
             [seminar.parse.scraping :as sp]
             [org.httpkit.client :as http]
             [clojure.string :as s]))
@@ -65,8 +65,6 @@
       (ensure-logged-in-admin state ((fnil inc 0) n)))))
 
 
-
-
 (defn perform-action-actual-get-seminar
   [state url]
   (log/debug "URL-GET-SEMINAR" url)
@@ -82,12 +80,44 @@
     {:cookies cookie-map
      :resp resp}))
 
+(defn perform-action-actual-get-member
+  [state url]
+  (log/debug "URL-GET-MEMBER" url)
+  (let [hc-params (:hc-params sp/config)
+        hc-params (assoc hc-params
+                         :headers {"Referer" (get-in sp/config [:urls :dashboard])})
+        
+        cookie-map (get-in @state [:session-ctx :cookies])
+        {:keys [status headers body error] :as resp}
+        @(http/get url
+                   (u/assoc-cookie cookie-map hc-params))
+        cookie-map (merge cookie-map (u/get-cookie headers))]
+    {:cookies cookie-map
+     :resp resp}))
+
+(defn perform-action-actual-register-member
+  [param]
+ ;; (log/debug "URL-GET-REGISTER-MEMBER" url)
+  (let [state (atom {})
+        _ (ensure-logged-in-admin state)
+        hc-params (:hc-params sp/config)
+        hc-params (assoc hc-params
+                         :headers {"Referer" (get-in sp/config [:urls :dashboard])})
+        
+        cookie-map (get-in @state [:session-ctx :cookies])
+        {:keys [status headers body error] :as resp}
+        @(http/get ""
+                   (u/assoc-cookie cookie-map hc-params))
+        cookie-map (merge cookie-map (u/get-cookie headers))]
+    {:cookies cookie-map
+     :resp resp}))
+
 
 (defn seminar*
   [state]
   (ensure-logged-in-admin state)
   (let [url-seminar (get-in sp/config [:urls :seminar-admin])
-        data-seminar (perform-action-get-seminar state url-seminar)
+        data-seminar (perform-action-actual-get-seminar state url-seminar)
         pagination (sp/parse-pagination (get-in data-seminar [:resp :body]))
         result (sp/parse-seminar-admin (get-in data-seminar [:resp :body]))]
     
@@ -97,8 +127,31 @@
                       (if (zero? i)
                         result
                         (recur (dec i)
-                               (let [data-seminar' (perform-action-get-seminar state (get pagination (dec i)))
+                               (let [data-seminar' (perform-action-actual-get-seminar state (get pagination (dec i)))
                                      r1 (sp/parse-seminar-admin (get-in data-seminar' [:resp :body]))]
+                                 (conj result r1)))))
+            result' (->> result'
+                         (conj result)
+                         flatten vec)]
+        result')
+      result)))
+
+(defn member*
+  [state]
+  (ensure-logged-in-admin state)
+  (let [url-member (get-in sp/config [:urls :member])
+        data-member (perform-action-actual-get-member state url-member)
+        pagination (sp/parse-pagination (get-in data-member [:resp :body]))
+        result (sp/parse-member-admin (get-in data-member [:resp :body]))]
+    
+    (if pagination
+      (let [result' (loop [i (count pagination)
+                           result []]
+                      (if (zero? i)
+                        result
+                        (recur (dec i)
+                               (let [data-member' (perform-action-actual-get-member state (get pagination (dec i)))
+                                     r1 (sp/parse-seminar-admin (get-in data-member' [:resp :body]))]
                                  (conj result r1)))))
             result' (->> result'
                          (conj result)
