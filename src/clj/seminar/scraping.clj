@@ -97,24 +97,87 @@
 
 (defn perform-action-actual-register-member
   [param]
- ;; (log/debug "URL-GET-REGISTER-MEMBER" url)
   (let [state (atom {})
         _ (ensure-logged-in-admin state)
+        urls (get-in sp/config [:urls])
         hc-params (:hc-params sp/config)
-        hc-params (assoc hc-params
-                         :headers {"Referer" (get-in sp/config [:urls :dashboard])})
-        
+                
         cookie-map (get-in @state [:session-ctx :cookies])
         {:keys [status headers body error] :as resp}
-        @(http/get ""
+        @(http/get (:login-front urls)
                    (u/assoc-cookie cookie-map hc-params))
-        cookie-map (merge cookie-map (u/get-cookie headers))]
+        cookie-map (merge cookie-map (u/get-cookie headers))
+
+        register-member-param (sp/create-register-member-param param)
+        
+        {:keys [status headers body error] :as resp}
+        @(http/post (:submit-register-member urls)
+                    (merge register-member-param
+                           (u/assoc-cookie cookie-map hc-params)))
+        cookie-map (merge cookie-map (u/get-cookie headers))
+        
+        error-message (if (= 200 status)
+                        (sp/parse-has-error body)
+                        [])
+        
+        {:keys [status headers body error] :as resp}
+        @(http/get (:login-front urls)
+                   (u/assoc-cookie cookie-map hc-params))
+        cookie-map (merge cookie-map (u/get-cookie headers))
+
+        parse-alert (sp/parse-alert-message body)
+
+        error-message (if (= "error" (:alertType parse-alert))
+                        (conj error-message
+                              (:message parse-alert))
+                        error-message)
+        success-message (when (= "success" (:alertType parse-alert))
+                          (:message parse-alert))
+        ]
     {:cookies cookie-map
-     :resp resp}))
+     :resp resp
+     :errorMessage error-message
+     :successMessage success-message}
+    ))
 
+(defn perform-action-actual-order-seminar
+  [state param]
+  (let [cookie-map (get-in @state [:session-ctx :cookies])
 
-(defn seminar*
-  [state]
+        urls (get-in sp/config [:urls])
+        hc-params (:hc-params sp/config)
+        
+        order-seminar-param (sp/create-seminar-order-param param)
+
+        {:keys [status headers body error] :as resp}
+        @(http/post (:submit-order-seminar urls)
+                    (merge order-seminar-param
+                           (u/assoc-cookie cookie-map hc-params)))
+        cookie-map (merge cookie-map (u/get-cookie headers))
+
+        resp-message (cheshire.core/parse-string body true)]
+    
+    {:resp resp
+     :respMessage resp-message
+     :cookies cookie-map}))
+
+(defn perform-action-actual-cetak-ticket
+  [state param]
+  (let [cookie-map (get-in @state [:session-ctx :cookies])
+
+        urls (get-in sp/config [:urls])
+        hc-params (:hc-params sp/config)
+
+        url-cetak-ticket (str (:cetak-ticket urls) "/" (:orderId param))
+
+        {:keys [status headers body error] :as resp}
+        @(http/get url-cetak-ticket
+                   (u/assoc-cookie cookie-map hc-params))]
+    resp))
+
+;; Main
+(defn perform-get-seminar
+  [state param]
   (ensure-logged-in-admin state)
   (let [url-seminar (get-in sp/config [:urls :seminar-admin])
         data-seminar (perform-action-actual-get-seminar state url-seminar)
@@ -136,8 +199,8 @@
         result')
       result)))
 
-(defn member*
-  [state]
+(defn perform-get-member
+  [state param]
   (ensure-logged-in-admin state)
   (let [url-member (get-in sp/config [:urls :member])
         data-member (perform-action-actual-get-member state url-member)
@@ -151,10 +214,19 @@
                         result
                         (recur (dec i)
                                (let [data-member' (perform-action-actual-get-member state (get pagination (dec i)))
-                                     r1 (sp/parse-seminar-admin (get-in data-member' [:resp :body]))]
+                                     r1 (sp/parse-member-admin (get-in data-member' [:resp :body]))]
                                  (conj result r1)))))
             result' (->> result'
                          (conj result)
                          flatten vec)]
         result')
       result)))
+
+(defn perform-register-member
+  [param]
+  (perform-action-actual-register-member param))
+
+(defn perform-order-seminar
+  [state param]
+  (ensure-logged-in-admin state)
+  (perform-action-actual-order-seminar param))
