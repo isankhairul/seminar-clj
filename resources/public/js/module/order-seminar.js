@@ -1,3 +1,8 @@
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+
 $(document).ready(function(){
 
 $('.btn-order').on('click', function(){
@@ -14,9 +19,14 @@ $('.btn-order').on('click', function(){
 })
 
 $('#submitOrder').on('click', function(){
+    if ( !validateEmail(email) ){
+        alert('Please input emails.');   
+        return false; 
+    }
+
     var id = $('#orderSeminarId').val();
     var email = $('#email').val();
-
+    
     $.ajax({
         type: "POST",
         dataType: "json",
@@ -35,6 +45,7 @@ $('#submitOrder').on('click', function(){
             
             if(data.status == "success"){
                 resultStatus = "Success Order";
+                resultMsg = "Serial Number: " + data.serial ;
                 $('#resultOrder').attr('class','alert alert-success');
             }
             
@@ -51,6 +62,7 @@ $('#submitOrder').on('click', function(){
             $("#form-order input").prop("disabled", false);
         }
     });
+    
     console.log(email);
 })
 
