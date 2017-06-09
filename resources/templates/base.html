@@ -4,7 +4,13 @@
 <head>
   <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <META name="viewport" content="width=device-width, initial-scale=1">
-  <title>Welcome to seminar</title>
+  <title>
+    {% if not-empty? title %}
+      {{title}}
+    {% else %}
+      Welcome to seminar
+    {% endif %}
+  </title>
 
   <!-- styles -->
   <!-- Font Awesome -->
@@ -41,7 +47,7 @@
             <a class="nav-link" href="{{servlet-context}}/list-member">List Member <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item {% ifequal page "order-seminar.html" %} active{%endifequal%}">
-            <a class="nav-link" href="{{servlet-context}}/order-seminar">Order Seminar <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="{{servlet-context}}/list-seminar">Order Seminar <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item {% ifequal page "history-orde.html" %} active{%endifequal%}">
             <a class="nav-link" href="{{servlet-context}}/history-order">History Order <span class="sr-only">(current)</span></a>
@@ -55,6 +61,9 @@
   <div class="container">
     {% block content %} {% endblock %}
   </div>
+  <script type="text/javascript">
+    var context = "{{servlet-context}}";
+  </script>
 
   <!-- scripts -->
   {% script "/js/jquery.min.js" %} 
@@ -62,15 +71,7 @@
   {% script "/bower_components/MDBootstrap/js/bootstrap.min.js" %} 
   {% script "/bower_components/MDBootstrap/js/mdb.min.js" %}
   {% script "/bower_components/MDBootstrap/js/compiled.min.js" %} 
-
-  <script type="text/javascript">
-    var context = "{{servlet-context}}";
-  </script>
-
-  {% for item in add-js %}
-  <script src="{{item}}" type="text/javascript"></script>
-  {% endfor %} 
-
+  {% for item in add-js %}<script src="{{servlet-context}}/{{item}}" type="text/javascript"></script>{% endfor %} 
   {% block page-scripts %} 
   {% endblock %}
 </body>

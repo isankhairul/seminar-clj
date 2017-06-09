@@ -9,6 +9,9 @@
     </div>
     <hr class="mt-2 mb-2">
     <br/> <br/> <br/>
+
+    <div class="col-md-12">
+    {% if not-empty? listSeminar %}
     <table class="table table-hover">
         <thead>
             <tr>
@@ -24,34 +27,33 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>Mobile Application</td>
-                <td>2017-07-20 09:00:00</td>
-                <td>Harianto</td>
-                <td>Auditorium Mercu Buana</td>
-                <td>50</td>
-                <td>49</td>
-                <td>Active</td>
-                <td>
-                    <button type="button" data-toggle="modal" data-target="#modalOrder" class="btn btn-order warning-color-dark waves-effect">Order</button>
-                </td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>IT Security</td>
-                <td>2017-07-20 08:00:00</td>
-                <td>Budi</td>
-                <td>Auditorium Mercu Buana</td>
-                <td>100</td>
-                <td>98</td>
-                <td>Active</td>
-                <td>
-                    <button type="button" data-toggle="modal" data-target="#modalOrder" class="btn btn-order warning-color-dark waves-effect">Order</button>
-                </td>
-            </tr>
+        {% for item in listSeminar %}
+        <tr data-id="{{item.seminarId}}"  data-tema="{{item.tema}}">
+            <td>{{item.seminarId}}</td>
+            <td>{{item.tema}}</td>
+            <td>{{item.jadwal}}</td>
+            <td>{{item.pembicara}}</td>
+            <td>{{item.tempat}}</td>
+            <td>{{item.kuota}}</td>
+            <td>{{item.sisaKuota}}</td>
+            <td>
+                {% if item.status = 1 %} Active 
+                {% else %} Non Active 
+                {% endif %}
+            </td>
+            <td>
+                <button type="button" class="btn btn-order warning-color-dark waves-effect">
+                    Order
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
+    {% else %}
+        Seminar Empty
+    {% endif %}
+    </div>
 </div>
 
 <!-- Central Modal Medium Info -->
@@ -62,8 +64,9 @@
         <div class="modal-content">
             <!--Header-->
             <div class="modal-header info-color">
-                <p class="heading lead">Order Seminar : Mobile Application</p>
-
+                <p class="heading lead">
+                    Order Seminar: <span id="orderTema"> </span>
+                </p>
                 <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true" class="white-text">&times;</span>
                 </button>-->
@@ -71,15 +74,6 @@
 
             <!--Body-->
             <div class="modal-body">
-                <div id="progress-order" style="display:none;">
-                    <div class="text-center">
-                        <div class="progress info-color">
-                            <div class="indeterminate"></div>
-                        </div>
-                        <p>Mohon tunggu data register anda sedang kami proses.</p>
-                    </div>
-                </div>
-                
                 <div id="form-order">
                     <!--Form with header-->
                     <div class="card ">
@@ -89,19 +83,25 @@
                                 <input name="" type="email" id="email" class="form-control validate">
                                 <label for="email" data-error="input_valid_email">Email</label>
                             </div>
+                            <input name="" type="hidden" id="orderSeminarId" class="form-control" readonly>
                             <div class="text-left">
-                                <button class="btn btn-deep-purple">Submit</button>
+                                <button id="submitOrder" class="btn btn-deep-purple">Submit</button>
                             </div>
                         </div>
                     </div>
                     <!--/Form with header-->
                 </div>
-                <div id="result-order" style="display:block;">
-                     <br/>
-                    <div class="alert alert-success">
-                        Berhasil Order, <br/>
-                        Serial Number : MBLPPLCTN-0001
+                <div id="progress-order" style="display:none;">
+                    <div class="text-center">
+                        <div class="progress info-color">
+                            <div class="indeterminate"></div>
+                        </div>
                     </div>
+                </div>
+                <br/>
+                <div id="resultOrder" style="display:none;" class="alert alert-danger">
+                    <span id="resultStatus"> </span>, <br/>
+                    <span id="resulMsg"> Serial Number : MBLPPLCTN-0001 </span> 
                 </div>
                 <hr/>
                 <div id="modal-button-close" class="text-right">
@@ -113,5 +113,4 @@
     </div>
 </div>
 <!-- Central Modal Medium Info-->
-
 {% endblock %}

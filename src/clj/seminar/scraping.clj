@@ -2,35 +2,56 @@
   (:require [clojure.tools.logging :as log]
             [seminar.util :as u]
             [seminar.parse.scraping :as sp]
+            [seminar.config :as cfg]
             [org.httpkit.client :as http]
             [clojure.string :as s]))
+
+(defn api-action
+  [method url opts & [n]]
+  (try
+    (let [result @(http/request
+                   (merge {:method method :url (str url)} opts))]
+      result)
+
+    (catch Throwable e
+      (log/debug "ERROR-ACTION" (pr-str [url (.getMessage e)]))
+
+      ;; max retry 2 times
+      (when (> (or n 0) 1)
+        (throw (Exception. (str "Failed request api-action after 2 times. " url))))
+
+      ;; callback when timeout
+      (api-action method url opts ((fnil inc 0) n)))))
 
 
 (defn login-admin []
   (let [hc-params (:hc-params sp/config)
+        
         {:keys [status headers body error] :as resp}
-        @(http/get (get-in sp/config [:urls :login-admin]) hc-params)
+        (api-action :get (get-in sp/config [:urls :login-admin]) hc-params)
 
         hc-params (assoc hc-params
                          :headers {"Referer" (get-in sp/config [:urls :login-admin])})
         cookie-map (u/get-cookie headers)
-        admin-username (get-in seminar.config/credentials [:admin :username])
-        admin-password (get-in seminar.config/credentials [:admin :password])
+        admin-username (get-in cfg/credentials [:admin :username])
+        admin-password (get-in cfg/credentials [:admin :password])
         
         login-param (sp/create-loginadmin-param admin-username admin-password)
         
         {:keys [status headers body error] :as resp}
-        @(http/post (get-in sp/config [:urls :do-login-admin])
+        (api-action :post (get-in sp/config [:urls :do-login-admin])
                     (u/assoc-cookie cookie-map
                                     (merge hc-params login-param)))
+        
         _ (when-not (= 302 status)
             (throw (Exception. (str "Invalid login - username:" admin-username))))
         
         cookie-map (merge cookie-map (u/get-cookie headers))
         
         {:keys [status headers body error] :as resp}
-        @(http/get (get-in sp/config [:urls :dashboard])
-                   (u/assoc-cookie cookie-map hc-params))
+        (api-action :get (get-in sp/config [:urls :dashboard])
+                    (u/assoc-cookie cookie-map hc-params))
+        
         cookie-map (merge cookie-map (u/get-cookie headers))]
     
     {:cookies cookie-map}))
@@ -43,8 +64,9 @@
         hc-params (assoc hc-params
                          :headers {"Referer" (get-in sp/config [:urls :login-admin])})
         {:keys [status headers body error] :as resp}
-        @(http/get (get-in sp/config [:urls :dashboard])
-                   (u/assoc-cookie cookie-map hc-params))
+        (api-action :get (get-in sp/config [:urls :dashboard])
+                    (u/assoc-cookie cookie-map hc-params))
+        
         user-menu? (sp/parse-loggedadmin body)
         location (:location headers)]
     
@@ -59,7 +81,7 @@
     (if-not (and (:session-ctx @state)
                  (logged-in-admin? @state))
       (swap! state assoc :session-ctx (login-admin))
-      (log/debug "Already logged in"))
+      (log/debug "Already logged in" true))
     (catch Throwable e
       (log/debug "Login fail" (.getMessage e))
       (ensure-logged-in-admin state ((fnil inc 0) n)))))
@@ -74,8 +96,8 @@
         
         cookie-map (get-in @state [:session-ctx :cookies])
         {:keys [status headers body error] :as resp}
-        @(http/get url
-                   (u/assoc-cookie cookie-map hc-params))
+        (api-action :get url (u/assoc-cookie cookie-map hc-params))
+        
         cookie-map (merge cookie-map (u/get-cookie headers))]
     {:cookies cookie-map
      :resp resp}))
@@ -89,14 +111,29 @@
         
         cookie-map (get-in @state [:session-ctx :cookies])
         {:keys [status headers body error] :as resp}
-        @(http/get url
-                   (u/assoc-cookie cookie-map hc-params))
+        (api-action :get url (u/assoc-cookie cookie-map hc-params))
+        
+        cookie-map (merge cookie-map (u/get-cookie headers))]
+    {:cookies cookie-map
+     :resp resp}))
+
+(defn perform-action-actual-get-peserta
+  [state url]
+  (log/debug "URL-GET-PESERTA" url)
+  (let [hc-params (:hc-params sp/config)
+        hc-params (assoc hc-params
+                         :headers {"Referer" (get-in sp/config [:urls :dashboard])})
+        
+        cookie-map (get-in @state [:session-ctx :cookies])
+        {:keys [status headers body error] :as resp}
+        (api-action :get url (u/assoc-cookie cookie-map hc-params))
+        
         cookie-map (merge cookie-map (u/get-cookie headers))]
     {:cookies cookie-map
      :resp resp}))
 
 (defn perform-action-actual-register-member
-  [param]
+  [params]
   (let [state (atom {})
         _ (ensure-logged-in-admin state)
         urls (get-in sp/config [:urls])
@@ -104,16 +141,18 @@
                 
         cookie-map (get-in @state [:session-ctx :cookies])
         {:keys [status headers body error] :as resp}
-        @(http/get (:login-front urls)
-                   (u/assoc-cookie cookie-map hc-params))
+        (api-action :get (:login-front urls)
+                    (u/assoc-cookie cookie-map hc-params))
+        
         cookie-map (merge cookie-map (u/get-cookie headers))
 
-        register-member-param (sp/create-register-member-param param)
+        register-member-param (sp/create-register-member-param params)
         
         {:keys [status headers body error] :as resp}
-        @(http/post (:submit-register-member urls)
+        (api-action :post (:submit-register-member urls)
                     (merge register-member-param
                            (u/assoc-cookie cookie-map hc-params)))
+        
         cookie-map (merge cookie-map (u/get-cookie headers))
         
         error-message (if (= 200 status)
@@ -121,8 +160,9 @@
                         [])
         
         {:keys [status headers body error] :as resp}
-        @(http/get (:login-front urls)
-                   (u/assoc-cookie cookie-map hc-params))
+        (api-action :get (:login-front urls)
+                    (u/assoc-cookie cookie-map hc-params))
+        
         cookie-map (merge cookie-map (u/get-cookie headers))
 
         parse-alert (sp/parse-alert-message body)
@@ -141,18 +181,19 @@
     ))
 
 (defn perform-action-actual-order-seminar
-  [state param]
+  [state params]
   (let [cookie-map (get-in @state [:session-ctx :cookies])
 
         urls (get-in sp/config [:urls])
         hc-params (:hc-params sp/config)
         
-        order-seminar-param (sp/create-seminar-order-param param)
+        order-seminar-param (sp/create-order-seminar-param params)
 
         {:keys [status headers body error] :as resp}
-        @(http/post (:submit-order-seminar urls)
+        (api-action :post (:submit-order-seminar urls)
                     (merge order-seminar-param
                            (u/assoc-cookie cookie-map hc-params)))
+        
         cookie-map (merge cookie-map (u/get-cookie headers))
 
         resp-message (cheshire.core/parse-string body true)]
@@ -162,22 +203,31 @@
      :cookies cookie-map}))
 
 (defn perform-action-actual-cetak-ticket
-  [state param]
+  [state params]
   (let [cookie-map (get-in @state [:session-ctx :cookies])
 
         urls (get-in sp/config [:urls])
-        hc-params (:hc-params sp/config)
+        hc-params (assoc (:hc-params sp/config) :as :stream)
 
-        url-cetak-ticket (str (:cetak-ticket urls) "/" (:orderId param))
+        url-cetak-ticket (str (:cetak-ticket urls) "/" (:orderId params))
 
         {:keys [status headers body error] :as resp}
-        @(http/get url-cetak-ticket
-                   (u/assoc-cookie cookie-map hc-params))]
-    resp))
+        (api-action :get url-cetak-ticket (u/assoc-cookie cookie-map hc-params))
+        
+        filename-attach (some-> (re-find #"\"([^\"]*)\""
+                                         (str (:content-disposition headers)))
+                                last
+                                (s/replace #"\ " ""))
+        
+        filename (str "/tmp/" filename-attach)]
+    ;;save into temporaryfile
+    (clojure.java.io/copy body (java.io.File. filename))
+    
+    filename))
 
 ;; Main
 (defn perform-get-seminar
-  [state param]
+  [state params]
   (ensure-logged-in-admin state)
   (let [url-seminar (get-in sp/config [:urls :seminar-admin])
         data-seminar (perform-action-actual-get-seminar state url-seminar)
@@ -200,7 +250,7 @@
       result)))
 
 (defn perform-get-member
-  [state param]
+  [state params]
   (ensure-logged-in-admin state)
   (let [url-member (get-in sp/config [:urls :member])
         data-member (perform-action-actual-get-member state url-member)
@@ -223,10 +273,20 @@
       result)))
 
 (defn perform-register-member
-  [param]
-  (perform-action-actual-register-member param))
+  [params]
+  (perform-action-actual-register-member params))
 
 (defn perform-order-seminar
-  [state param]
+  [state params]
   (ensure-logged-in-admin state)
-  (perform-action-actual-order-seminar param))
+  (-> (perform-action-actual-order-seminar state params)
+      :respMessage))
+
+(defn perform-get-peserta
+  [state params]
+  (let []))
+
+(defn perform-cetak-ticket
+  [state params]
+  (ensure-logged-in-admin state)
+  (perform-action-actual-cetak-ticket state params))

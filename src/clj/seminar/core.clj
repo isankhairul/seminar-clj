@@ -6,7 +6,8 @@
             [seminar.config :refer [env]]
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.tools.logging :as log]
-            [mount.core :as mount])
+            [mount.core :as mount]
+            [seminar.worker_pool :as sw])
   (:gen-class))
 
 (def cli-options
@@ -52,4 +53,5 @@
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop-app)))
 
 (defn -main [& args]
+  (sw/initialize-all-default-workers 20)
   (start-app args))

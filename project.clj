@@ -3,7 +3,9 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
 
-  :dependencies [[clj-time "0.13.0"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/core.async "0.3.443"]
+                 [clj-time "0.13.0"]
                  [compojure "1.6.0"]
                  [cprop "0.1.10"]
                  [funcool/struct "1.0.0"]

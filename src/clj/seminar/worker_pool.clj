@@ -1,4 +1,4 @@
-(ns seminar.worker-pool
+(ns seminar.worker_pool
   (:require [clojure.tools.logging :as log]
             [clojure.core.async :as async]))
 
@@ -47,11 +47,14 @@
   (println "Initializing worker-pool for" name "with" n "workers.")
   (init-workers* name worker-pool n))
 
-(defn initialize-all-default-workers []
-  (let [workers [["seminar" 20]
-                 ["seminar-scheduler" 20]]]
-    (doseq [[name n] workers]
-      (initialize-workers name n))))
+(defn initialize-all-default-workers
+  ([] (initialize-all-default-workers 20))
+  ([n]
+   (let [n (or n 20)
+         workers [["seminar" n]
+                  ["seminar-scheduler" n]]]
+     (doseq [[name i] workers]
+       (initialize-workers name n)))))
 
 
 (defn get-standby-workers-count []
