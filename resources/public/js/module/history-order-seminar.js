@@ -2,9 +2,7 @@ $(document).ready(function(){
 
 
 $('#searchOrder').on('click', function(){
-    
     var email = $('#email').val();
-    
     if ( !validateEmail(email) ){
         alert('Please input emails.');   
         return false; 

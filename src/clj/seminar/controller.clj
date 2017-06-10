@@ -127,3 +127,21 @@
         (log/debug "Error History Order" (pr-str (.getMessage e))))
       (finally
         (sw/give-worker "seminar" state)))))
+
+(defn cetak-ticket
+  [order-id]
+  (when-let [state (sw/take-worker "seminar")]
+    (try
+      (ss/ensure-logged-in-admin state)
+      (let [filename (ss/perform-cetak-ticket state {:orderId order-id})
+            name (.getName (clojure.java.io/file filename))]
+        (log/debug "FILENAME" filename)
+        {:headers {"Content-Type" "application/pdf"
+                   "content-disposition" (str "attachment; filename=" name)}
+         :body (clojure.java.io/input-stream
+                (clojure.java.io/file filename))})
+      
+      (catch Throwable e
+        (log/debug "Error History Order" (pr-str (.getMessage e))))
+      (finally
+        (sw/give-worker "seminar" state)))))

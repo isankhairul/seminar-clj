@@ -21,5 +21,6 @@
   (GET "/list-seminar" ctx (controller/get-list-seminar ctx))
   (POST "/ajax/order-seminar" ctx (controller/ajax-order-seminar ctx))
   (GET "/history-order" ctx (controller/view-history-order ctx))
-  (POST "/get-history-order" ctx (controller/get-history-order ctx)))
+  (POST "/get-history-order" ctx (controller/get-history-order ctx))
+  (GET "/cetak-ticket/:id" [id] (controller/cetak-ticket id)))
 
