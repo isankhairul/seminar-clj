@@ -3,10 +3,31 @@
             [seminar.util :as u]
             [seminar.layout :as layout]
             [seminar.worker_pool :as sw]
+            [seminar.model :as model]
             [seminar.scraping :as ss]
             [clojure.java.io :as io]
             [clojure.string :as s]))
 
+
+(defn save-member-db
+  [list-member]
+  (when (not-empty list-member)
+    (mapv
+     (fn [member]
+       (let [data-db (array-map
+                      :member_id (:member_id member)
+                      :email (:email member)
+                      :firstname (:firstname member)
+                      :lastname (:lastname member)
+                      :gender (:gender member)
+                      :dob (:dob member)
+                      :phone (:phone member)
+                      :status (:status member))]
+         (if (empty? (model/-check-table
+                        "member" {:member_id (:member_id member)}))
+           (model/-insert-table "member" data-db))))
+     
+     list-member)))
 
 (defn get-list-seminar
   [ctx]
@@ -15,8 +36,8 @@
       (ss/ensure-logged-in-admin state)
       
       (let [result (->> (ss/perform-get-seminar state {})
-                        (sort-by :seminarId))
-
+                        (sort-by :seminar_id))
+            
             add-js ["js/global-helper.js"
                     "js/module/order-seminar.js"]
             
@@ -39,8 +60,11 @@
       (ss/ensure-logged-in-admin state)
       
       (let [result  (->> (ss/perform-get-member state {})
-                         (sort-by :memberId))
-
+                         (sort-by :member_id))
+            _ (log/debug "RESULT" (pr-str result))
+            _ (when (not-empty result)
+                (save-member-db result))
+            
             data {:title "List Member"
                   :listMember result}]
         
@@ -67,15 +91,22 @@
       
       (let [params (:params ctx)
             
-            {:keys [seminarId email]} params
-            
+            {:keys [seminar_id email]} params
+
+            member (some-> (ss/perform-get-member state {})
+                           (get-peserta-from-email email))
             result (ss/perform-order-seminar state params)
             
-            serial (when (= "success" (:status result))
-                     (let [list-peserta (ss/perform-get-peserta
-                                         state {:seminarId seminarId})
-                           peserta (first (get-peserta-from-email list-peserta email))]
-                       (:serial peserta)))
+            [serial] (when (= "success" (:status result))
+                       (let [list-peserta (ss/perform-get-peserta
+                                           state {:seminar_id seminar_id})
+                             peserta (first (get-peserta-from-email list-peserta email))
+                             
+                             data-db (array-map
+                                      :seminar_id seminar_id
+                                      :member_id member
+                                      :serial (:serial peserta))] 
+                         [(:serial peserta)]))
 
             result (assoc result :serial serial)]
         

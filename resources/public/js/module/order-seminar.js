@@ -27,7 +27,7 @@ $('#submitOrder').on('click', function(){
         type: "POST",
         dataType: "json",
         url: context + "/ajax/order-seminar",
-        data: {'seminarId': id, 'email': email},
+        data: {'seminar_id': id, 'email': email},
         cache: false,
         beforeSend: function() {
             

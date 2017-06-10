@@ -87,7 +87,7 @@
                               :else content)]
                 [key content]))
             [:no :tema :jadwal :pembicara :tempat :kuota
-             :sisaKuota :linkPeserta :status :seminarId])
+             :sisa_kuota :link_peserta :status :seminar_id])
            flatten
            (apply hash-map))
   )
@@ -134,7 +134,7 @@
                               :else content)]
                 [key content]))
             [:no :firstname :lastname :email
-             :gender :dob :phone :status :memberId])
+             :gender :dob :phone :status :member_id])
            flatten
            (apply hash-map))
   )
@@ -182,7 +182,7 @@
                               (-> content :content first boolean) (-> content :content first)
                               :else content)]
                 [key content]))
-            [:no :kehadiran :fullname :email :serial :tema :orderId])
+            [:no :kehadiran :fullname :email :serial :tema :order_id])
            flatten
            (apply hash-map))
   )
@@ -267,6 +267,6 @@
   [m]
   {:form-params
    {"email_member" (:email m)
-    "seminar_id" (:seminarId m)}})
+    "seminar_id" (:seminar_id m)}})
 
 

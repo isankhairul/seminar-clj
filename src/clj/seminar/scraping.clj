@@ -291,7 +291,7 @@
 
         state-map (update-in state-map [:session-ctx :cookies]
                              (fn [st] (merge st cookies)))
-        url-peserta (str (:list-peserta urls) "/" (:seminarId params))
+        url-peserta (str (:list-peserta urls) "/" (:seminar_id params))
         data-peserta (perform-action-actual-get-peserta (atom state-map) url-peserta)
 
         pagination (sp/parse-pagination (get-in data-peserta [:resp :body]))

@@ -27,12 +27,37 @@
             :port "3306"}))
 
 (defentity seminar
-  (pk :seminarId))
+  (pk :seminar_id))
 
 (defentity member
-  (pk :memberId))
+  (pk :member_id))
 
 (defentity seminar_order
-  (pk :orderId))
+  (pk :orderId)
+  (has-one seminar :seminar_id)
+  (has-one member :member_id))
 
+(defn -insert-table
+  [tm m]
+  (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
+    (insert tm (values m))))
 
+(defn -update-table
+  [tm p-fields p-where]
+  (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
+    (update tm
+            (set-fields p-fields)
+            (where p-where))))
+
+(defn -delete-table
+  [tm p-fields p-where]
+  (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
+    (update tm
+            (set-fields p-fields)
+            (where p-where))))
+
+(defn -check-table
+  [tm p-where]
+  (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
+    (select tm
+            (where p-where))))

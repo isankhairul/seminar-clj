@@ -28,14 +28,14 @@
         </thead>
         <tbody>
         {% for item in listSeminar %}
-        <tr data-id="{{item.seminarId}}"  data-tema="{{item.tema}}">
-            <td>{{item.seminarId}}</td>
+        <tr data-id="{{item.seminar_id}}"  data-tema="{{item.tema}}">
+            <td>{{item.seminar_id}}</td>
             <td>{{item.tema}}</td>
             <td>{{item.jadwal}}</td>
             <td>{{item.pembicara}}</td>
             <td>{{item.tempat}}</td>
             <td>{{item.kuota}}</td>
-            <td>{{item.sisaKuota}}</td>
+            <td>{{item.sisa_kuota}}</td>
             <td>
                 {% if item.status = 1 %} Active 
                 {% else %} Non Active 
