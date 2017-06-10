@@ -209,7 +209,7 @@
         urls (get-in sp/config [:urls])
         hc-params (assoc (:hc-params sp/config) :as :stream)
 
-        url-cetak-ticket (str (:cetak-ticket urls) "/" (:orderId params))
+        url-cetak-ticket (str (:cetak-ticket urls) "/" (:order_id params))
 
         {:keys [status headers body error] :as resp}
         (api-action :get url-cetak-ticket (u/assoc-cookie cookie-map hc-params))

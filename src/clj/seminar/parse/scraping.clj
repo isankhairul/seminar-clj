@@ -167,14 +167,14 @@
             (fn [key tag-td]
               (let [count-content (count (:content tag-td))
                     content (first (:content tag-td))
-                    _ (log/debug "CONTENT" (pr-str (:content tag-td)))
+                    ;;_ (log/debug "CONTENT" (pr-str (:content tag-td)))
                     content (cond
                               (= :kehadiran key) (some->> tag-td
                                                           (hs/select
                                                            (hs/tag :input))
                                                           last :attrs :checked
                                                           (nil?) (not))
-                              (= :orderId key) (some-> (hs/select
+                              (= :order_id key) (some-> (hs/select
                                                         (hs/tag :a) tag-td)
                                                        last :attrs :href str
                                                        (s/split #"\/")

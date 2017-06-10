@@ -16,6 +16,7 @@ $('#searchOrder').on('click', function(){
         cache: false,
         beforeSend: function() {
             $('#resultHistoryOrder').empty();
+            $('#progress').show();
         },
         success: function(data){
             $('#resultHistoryOrder').html( data );
@@ -24,6 +25,7 @@ $('#searchOrder').on('click', function(){
             //alert(error);
         },
         complete: function(){
+            $('#progress').hide();
         }
     });
     

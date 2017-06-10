@@ -94,7 +94,8 @@
             {:keys [seminar_id email]} params
 
             member (some-> (ss/perform-get-member state {})
-                           (get-peserta-from-email email))
+                           (get-peserta-from-email email)
+                           first)
             result (ss/perform-order-seminar state params)
             
             [serial] (when (= "success" (:status result))
@@ -104,8 +105,12 @@
                              
                              data-db (array-map
                                       :seminar_id seminar_id
-                                      :member_id member
-                                      :serial (:serial peserta))] 
+                                      :member_id (:member_id member)
+                                      :serial (:serial peserta))]
+                         (log/debug "DATA-DB" data-db)
+                         ;;save to db
+                         (model/-insert-table "seminar_order" data-db)
+                         
                          [(:serial peserta)]))
 
             result (assoc result :serial serial)]
@@ -133,11 +138,11 @@
 
       (let [email (get-in ctx [:params :email])
             list-seminar (->> (ss/perform-get-seminar state {})
-                              (sort-by :seminarId))
+                              (sort-by :seminar_id))
 
             list-seminar-with-peserta  (mapv (fn [seminar]
                                                (let [list-peserta (ss/perform-get-peserta
-                                                                   state {:seminarId (:seminarId seminar)})]
+                                                                   state {:seminar_id (:seminar_id seminar)})]
                                                  (assoc seminar :listPeserta list-peserta)))
                                              list-seminar)
             merge-seminar-peserta (for [seminar list-seminar-with-peserta
@@ -146,10 +151,12 @@
                                         (merge peserta)))
 
             filter-peserta (->> (get-peserta-from-email merge-seminar-peserta email)
-                                (sort-by :seminarId)
+                                (sort-by :seminar_id)
                                 (mapv (fn [idx peserta]
                                         (assoc peserta :no (inc idx)))
                                       (range)))]
+        (log/debug "list-seminar-with-peserta" (pr-str list-seminar-with-peserta))
+        (log/debug "merge-seminar-peserta" (pr-str merge-seminar-peserta))
         
         (selmer.parser/render-file "result-search-history-order.html"
                                    {:listPeserta filter-peserta}))
@@ -164,7 +171,7 @@
   (when-let [state (sw/take-worker "seminar")]
     (try
       (ss/ensure-logged-in-admin state)
-      (let [filename (ss/perform-cetak-ticket state {:orderId order-id})
+      (let [filename (ss/perform-cetak-ticket state {:order_id order-id})
             name (.getName (clojure.java.io/file filename))]
         (log/debug "FILENAME" filename)
         {:headers {"Content-Type" "application/pdf"
