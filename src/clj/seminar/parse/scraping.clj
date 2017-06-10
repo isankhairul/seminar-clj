@@ -18,7 +18,7 @@
       :dashboard (str base-url "/dashboard")
       :member (str base-url "/member")
       :seminar-admin (str base-url "/seminar-admin")
-      :list-peserta (str base-url "/c_seminar/listPeserta")
+      :list-peserta (str base-url "/backend/c_seminar/listPeserta")
       
       ;;front
       :login-front (str base-url "/login")
@@ -205,6 +205,8 @@
                           (mapv parse-peserta-admin-table-tr)
                           (remove empty?))]
       result)))
+
+
 
 (defn parse-has-error
   [html]

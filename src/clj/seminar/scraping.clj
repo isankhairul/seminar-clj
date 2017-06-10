@@ -284,7 +284,35 @@
 
 (defn perform-get-peserta
   [state params]
-  (let []))
+  (ensure-logged-in-admin state)
+  (let [state-map @state
+        urls (get-in sp/config [:urls])
+        {:keys [resp cookies]} (perform-action-actual-get-member state (:member urls))
+
+        state-map (update-in state-map [:session-ctx :cookies]
+                             (fn [st] (merge st cookies)))
+        url-peserta (str (:list-peserta urls) "/" (:seminarId params))
+        data-peserta (perform-action-actual-get-peserta (atom state-map) url-peserta)
+
+        pagination (sp/parse-pagination (get-in data-peserta [:resp :body]))
+        result (sp/parse-peserta-admin (get-in data-peserta [:resp :body]))]
+    
+    (if pagination
+      (let [result' (loop [i (count pagination)
+                           result []]
+                      (if (zero? i)
+                        result
+                        (recur (dec i)
+                               (let [data-peserta' (perform-action-actual-get-peserta
+                                                    state (get pagination (dec i)))
+                                     r1 (sp/parse-peserta-admin (get-in data-peserta' [:resp :body]))]
+                                 (conj result r1)))))
+            result' (->> result'
+                         (conj result)
+                         flatten vec)]
+        result')
+      result)
+    ))
 
 (defn perform-cetak-ticket
   [state params]

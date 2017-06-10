@@ -1,0 +1,36 @@
+{% if listPeserta|not-empty %}
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Tema</th>
+            <th>Tanggal</th>
+            <th>Pembicara</th>
+            <th>Tempat</th>
+            <th>Serial</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for item in listPeserta %}
+        <tr>
+            <td>{{item.no}} </td>
+            <td>{{item.tema}}</td>
+            <td>{{item.jadwal}}</td>
+            <td>{{item.pembicara}}</td>
+            <td>{{item.tempat}}</td>
+            <td>{{item.serial}}</td>
+            <td>
+                <i class="" aria-hidden="true"></i>
+                <button type="button" data-toggle="modal" data-target="#modalOrder" class=" btn btn-order warning-color-dark waves-effect">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </button>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <div>History Order not found.</div>
+{% endif %}

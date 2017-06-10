@@ -20,5 +20,6 @@
   (GET "/list-member" ctx (controller/get-list-member ctx))
   (GET "/list-seminar" ctx (controller/get-list-seminar ctx))
   (POST "/ajax/order-seminar" ctx (controller/ajax-order-seminar ctx))
-  (GET "/history-order" [] (layout/render "history-order.html")))
+  (GET "/history-order" ctx (controller/view-history-order ctx))
+  (POST "/get-history-order" ctx (controller/get-history-order ctx)))
 

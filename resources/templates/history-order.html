@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
 <!--Form without header-->
 <br/>
 <div class="row">
@@ -15,7 +16,7 @@
                 <label for="email" data-error="input_valid_email">Email</label>
             </div>
             <div class="text-left">
-                <button type="button" id="search" class="btn warning-color-dark waves-effect waves-light">
+                <button type="button" id="searchOrder" class="btn warning-color-dark waves-effect waves-light">
                     <i class="fa fa-search" aria-hidden="true"></i>
                     Search
                 </button>
@@ -25,43 +26,14 @@
 </div>
 <br/><br/>
 
-<div class="row" id="result-history-order">
+<div class="row">
     <div class="col-md-12">
         <!--Header-->
         <div class="text-left">
             <h3>Result Search History Order</h3>
             <hr class="mt-2 mb-2">
         </div>
-        <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Tema</th>
-                <th>Tanggal</th>
-                <th>Pembicara</th>
-                <th>Tempat</th>
-                <th>Serial</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>Mobile Application</td>
-                <td>2017-07-20 09:00:00</td>
-                <td>Harianto</td>
-                <td>Auditorium Mercu Buana</td>
-                <td>MBLPPLCTN-0001</td>
-                <td>
-                    <i class="" aria-hidden="true"></i>
-                    <button type="button" data-toggle="modal" data-target="#modalOrder" class=" btn btn-order warning-color-dark waves-effect">
-                        <i class="fa fa-print" aria-hidden="true"></i>
-                        Print
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        <div id="resultHistoryOrder"></div>
     </div>
 </div>
 <br/>
@@ -69,4 +41,5 @@
 
 <!-- Central Modal Medium Info-->
 <!--/Form without header-->
-{% endblock %} {% block page-scripts %} {% endblock %}
+
+{% endblock %}
