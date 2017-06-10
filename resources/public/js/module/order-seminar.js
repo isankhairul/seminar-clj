@@ -8,7 +8,7 @@ $('.btn-order').on('click', function(){
     $('#orderSeminarId').val( id );
     $('#orderTema').text( tema );
 
-    $('#result-order').hide();
+    $('#resultOrder').hide();
     $('#modalOrder').modal({backdrop: 'static'});
     console.log( $(parent).data('tema') );
 })
@@ -30,7 +30,7 @@ $('#submitOrder').on('click', function(){
         data: {'seminarId': id, 'email': email},
         cache: false,
         beforeSend: function() {
-            $('#result-order').hide();
+            
             $('#progress-order').show();
             $("#form-order input").prop("disabled", true);
             $('#resultOrder').attr('class','alert alert-danger');
