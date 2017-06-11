@@ -11,10 +11,10 @@
             <h3>Register Member</h3>
             <hr class="mt-2 mb-2">
         </div>
-        <form id="formRegisterMember"> 
+        <form id="formRegisterMember" enctype="multipart/form-data"> 
             <!--Body-->
             <div class="md-form">
-                <input type="email" name="email" id="email" class="form-control" data-validation="required,email">
+                <input type="text" name="email" id="email" class="form-control" data-validation="required,email">
                 <label for="email">Email</label>
             </div>
 
@@ -39,7 +39,7 @@
             </div>
 
             <div class="md-form">
-                <select class="mdb-select" data-validation="required">
+                <select name="gender" class="mdb-select" data-validation="required">
                     <option value="" disabled selected>Choose your option</option>
                     <option value="L">Laki-Laki</option>
                     <option value="P">Perempuan</option>
@@ -48,7 +48,7 @@
             </div>
 
             <div class="md-form">
-                <input type="text" name="dob" id="dob" data-validation="required" class="form-control datepicker">
+                <input type="text" name="dob" id="dob" required class="form-control datepicker">
                 <label for="dob">Date of birth</label>
             </div>
             <div class="file-field">
@@ -78,7 +78,7 @@
         <div class="modal-content">
             <!--Header-->
             <div class="modal-header info-color">
-                <p class="heading lead">Proses Register</p>
+                <p id="headingProsesRegister" class="heading lead">Proses Register</p>
 
                 <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true" class="white-text">&times;</span>
@@ -87,20 +87,20 @@
 
             <!--Body-->
             <div class="modal-body">
-                <div id="progress-register" style="display:none;">
+                <div id="progressRegister" style="display:none;">
                     <div class="text-center">
-                        <div class="progress info-color">
+                        <div class="progress primary-color-dark">
                             <div class="indeterminate"></div>
                         </div>
                         <p>Mohon tunggu data register anda sedang kami proses.</p>
                     </div>
                 </div>
-                <div id="result-register">
-                    <div class="alert alert-success">
+                <div id="resultRegister" class="alert alert-success">
+                    <div id="resulMsg">
                         Berhasil Register, Mohon cek email untuk aktivasi.
                     </div>
-                    
                 </div>
+                    
                 <hr/>
                 <div id="modal-button-close" class="text-right">
                     <a type="button" class="btn warning-color-dark waves-effect" data-dismiss="modal">Close</a>

@@ -67,6 +67,7 @@
           
      list-seminar)))
 
+
 (defn handler-scheduler-check-seminar []
   (log/debug "running scheduler-check-seminar...")
   (when-let [state (sw/take-worker "seminar-scheduler")]

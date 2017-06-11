@@ -258,15 +258,26 @@
 
 (defn create-register-member-param
   [m]
-  {:form-params
-   {"email" (:email m)
-    "password" (:password m)
-    "repassword" (:repassword m)
-    "firstname" (:firstname m)
-    "lastname" (:lastname m)
-    "gender" (:gender m)
-    "dob" (:dob m)
-    "phone" (:phone m)}})
+  (let [v1 [{:name "email" :content (:email m)}
+            {:name "password" :content (:password m)}
+            {:name "repassword" :content (:password m)}
+            {:name "firstname" :content (:firstname m)}
+            {:name "lastname" :content (:lastname m)}
+            {:name "gender" :content (:gender m)}
+            {:name "dob" :content (:dob_submit m)}
+            {:name "phone" :content (:phone m)}]
+
+        photo (:photo m)
+        
+        v1' (if (not-empty (:filename photo))
+              (let [filename (str "/tmp/" (:filename photo))]
+                (clojure.java.io/copy (:tempfile photo) (clojure.java.io/file filename))
+                (conj v1 {:name "photo"
+                          :filename (:filename photo)
+                          :content (clojure.java.io/file filename)}))
+              v1)]
+    
+    {:multipart v1'}))
 
 (defn create-order-seminar-param
   [m]

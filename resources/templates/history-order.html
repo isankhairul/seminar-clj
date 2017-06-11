@@ -1,5 +1,4 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <!--Form without header-->
 <br/>
 <div class="row">
@@ -12,7 +11,7 @@
         <form id="formSearchOrder">
             <!--Body-->
             <div class="md-form">
-                <input type="email" name="email" id="email" class="form-control" data-validation="required,email">
+                <input type="text" name="email" id="email" class="form-control" data-validation="required,email">
                 <label for="email">Email</label>
             </div>
             <div class="text-left">
@@ -34,13 +33,13 @@
             <hr class="mt-2 mb-2">
             <div id="progress" style="display:none;">
                 <div class="text-center">
-                    <div class="progress info-color">
+                    <div class="progress primary-color-dark">
                         <div class="indeterminate"></div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div id="resultHistoryOrder"></div>
     </div>
 </div>

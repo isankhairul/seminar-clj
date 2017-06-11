@@ -2,7 +2,7 @@
   (:require [seminar.layout :as layout]
             [seminar.controller :as controller]
             [seminar.model :as model]
-            [compojure.core :refer [defroutes GET POST]]
+            [compojure.core :refer [defroutes GET POST ANY]]
             [ring.util.http-response :as response]
             [clojure.java.io :as io]))
 
@@ -38,13 +38,15 @@
 
 (defroutes home-routes
   (GET "/" [] (home-page))
-  (GET "/register-member" ctx (controller/view-register ctx))
+  (GET "/view-register" ctx (controller/view-register ctx))
   (GET "/list-member" ctx (controller/get-list-member ctx))
   (GET "/list-seminar" ctx (controller/get-list-seminar ctx))
   (GET "/history-order" ctx (controller/view-history-order ctx))
   (GET "/cetak-ticket/:id" [id] (controller/cetak-ticket id))
   (GET "/email-preview" ctx (layout/render "email-notif.html" {:listSeminar dummy-seminar}))
-  
-  (POST "/ajax/order-seminar" ctx (controller/ajax-order-seminar ctx))
+
+  ;; AJAX PROCESS
+  (ANY "/register-member" ctx (controller/register-member ctx))
+  (POST "/order-seminar" ctx (controller/order-seminar ctx))
   (POST "/get-history-order" ctx (controller/get-history-order ctx)))
 

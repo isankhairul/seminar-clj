@@ -51,6 +51,11 @@
       ;; since they're not compatible with this middleware
       ((if (:websocket? request) handler wrapped) request))))
 
+(defn wrap-nocache [handler]
+  (fn [request]
+     (let [response (handler request)]
+        (assoc-in response [:headers  "Pragma"] "no-cache"))))
+
 (defn wrap-base [handler]
   (-> ((:middleware defaults) handler)
       wrap-webjars
@@ -61,4 +66,5 @@
             (assoc-in [:security :anti-forgery] false)
             (dissoc :session)))
       wrap-context
+      wrap-nocache
       wrap-internal-error))

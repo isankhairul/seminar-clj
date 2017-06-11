@@ -1,5 +1,7 @@
 $(document).ready(function(){
-
+$.validate({
+    form : '#formOrder'
+});
 $('.btn-order').on('click', function(){
     var parent =  $(this).parent().parent();
     var id = $(parent).data('id');
@@ -13,20 +15,16 @@ $('.btn-order').on('click', function(){
     console.log( $(parent).data('tema') );
 })
 
-$('#submitOrder').on('click', function(){
+$('#formOrder').on('submit', function(event){
+    event.preventDefault();
     
     var id = $('#orderSeminarId').val();
     var email = $('#email').val();
     
-    if ( !validateEmail(email) ){
-        alert('Please input emails.');   
-        return false; 
-    }
-
     $.ajax({
         type: "POST",
         dataType: "json",
-        url: context + "/ajax/order-seminar",
+        url: context + "/order-seminar",
         data: {'seminar_id': id, 'email': email},
         cache: false,
         beforeSend: function() {
@@ -44,10 +42,8 @@ $('#submitOrder').on('click', function(){
                 resultMsg = "Serial Number: " + data.serial ;
                 $('#resultOrder').attr('class','alert alert-success');
             }
-            
             $('#resultStatus').text( resultStatus );
             $('#resulMsg').text( resultMsg );
-            $('#resultOrder').show();
             console.log( data );
         },
         error: function (request, status, error) {
@@ -56,6 +52,7 @@ $('#submitOrder').on('click', function(){
         complete: function(){
             $('#progress-order').hide();
             $("#form-order input").prop("disabled", false);
+            $('#resultOrder').show();
         }
     });
     

@@ -8,81 +8,8 @@
             [clojure.java.io :as io]
             [clojure.string :as s]))
 
-(defn view-register
-  [ctx]
-  (layout/render "register-member.html"
-                 {:title "Register Member"
-                  :add-css ["bower_components/jquery-form-validator/src/theme-default.css"]
-                  :add-js ["js/global-helper.js"
-                           "bower_components/jquery-form-validator/form-validator/jquery.form-validator.min.js"
-                           "js/module/register-member.js"]}))
 
-(defn save-member-db
-  [list-member]
-  (when (not-empty list-member)
-    (mapv
-     (fn [member]
-       (let [data-db (array-map
-                      :member_id (:member_id member)
-                      :email (:email member)
-                      :firstname (:firstname member)
-                      :lastname (:lastname member)
-                      :gender (:gender member)
-                      :dob (:dob member)
-                      :phone (:phone member)
-                      :status (:status member))]
-         (if (empty? (model/check-table
-                        "member" {:member_id (:member_id member)}))
-           (model/insert-table "member" data-db))))
-     
-     list-member)))
-
-(defn get-list-seminar
-  [ctx]
-  (when-let [state (sw/take-worker "seminar")]
-    (try
-      (ss/ensure-logged-in-admin state)
-      
-      (let [result (->> (ss/perform-get-seminar state {})
-                        (sort-by :seminar_id))
-            
-            data {:title "Order Seminar"
-                  :add-css ["bower_components/jquery-form-validator/src/theme-default.css"]
-                  :add-js ["js/global-helper.js"
-                           "bower_components/jquery-form-validator/form-validator/jquery.form-validator.min.js"
-                           "js/module/order-seminar.js"]
-                  :listSeminar result}]
-        
-        (layout/render "order-seminar.html" data))
-      
-      (catch Throwable e
-        (log/debug "Error List Seminar" (pr-str (.getMessage e))))
-      (finally
-        (sw/give-worker "seminar" state)))))
-
-
-(defn get-list-member
-  [ctx]
-  (when-let [state (sw/take-worker "seminar")]
-    (try
-      (ss/ensure-logged-in-admin state)
-      
-      (let [result  (->> (ss/perform-get-member state {})
-                         (sort-by :member_id))
-            _ (log/debug "RESULT" (pr-str result))
-            _ (when (not-empty result)
-                (save-member-db result))
-            
-            data {:title "List Member"
-                  :listMember result}]
-        
-        (layout/render "list-member.html" data))
-      
-      (catch Throwable e
-        (log/debug "Error List Member" (pr-str (.getMessage e))))
-      (finally
-        (sw/give-worker "seminar" state)))))
-
+;; HELPER
 (defn get-peserta-from-email
   [list-peserta email]
   (->> list-peserta
@@ -91,7 +18,15 @@
                  peserta)))
        (remove nil?)))
 
-(defn ajax-order-seminar
+
+;; AJAX PROCESS
+(defn register-member
+  [ctx]
+  (log/debug "RUN REGISTER")
+  (let [result (ss/perform-register-member (:params ctx))]
+    (cheshire.core/generate-string result)))
+
+(defn order-seminar
   [ctx]
   (when-let [state (sw/take-worker "seminar")]
     (try
@@ -130,16 +65,6 @@
       (finally
         (sw/give-worker "seminar" state)))))
 
-
-(defn view-history-order
-  [ctx]
-  (layout/render "history-order.html"
-                 {:title "History Order"
-                  :add-css ["bower_components/jquery-form-validator/src/theme-default.css"]
-                  :add-js ["js/global-helper.js"
-                           "bower_components/jquery-form-validator/form-validator/jquery.form-validator.min.js"
-                           "js/module/history-order-seminar.js"]}))
-
 (defn get-history-order
   [ctx]
   (when-let [state (sw/take-worker "seminar")]
@@ -175,6 +100,94 @@
         (log/debug "Error History Order" (pr-str (.getMessage e))))
       (finally
         (sw/give-worker "seminar" state)))))
+
+;; END AJAX PROCESS
+
+
+(defn view-register
+  [ctx]
+  (layout/render "register-member.html"
+                 {:title "Register Member"
+                  :add-css ["bower_components/jquery-form-validator/src/theme-default.css"]
+                  :add-js ["js/global-helper.js"
+                           "bower_components/jquery-form-validator/form-validator/jquery.form-validator.min.js"
+                           "js/module/register-member.js"]}))
+
+
+(defn save-member-db
+  [list-member]
+  (when (not-empty list-member)
+    (mapv
+     (fn [member]
+       (let [data-db (array-map
+                      :member_id (:member_id member)
+                      :email (:email member)
+                      :firstname (:firstname member)
+                      :lastname (:lastname member)
+                      :gender (:gender member)
+                      :dob (:dob member)
+                      :phone (:phone member)
+                      :status (:status member))]
+         (if (empty? (model/check-table
+                        "member" {:member_id (:member_id member)}))
+           (model/insert-table "member" data-db))))
+     
+     list-member)))
+
+(defn get-list-seminar
+  [ctx]
+  (when-let [state (sw/take-worker "seminar")]
+    (try
+      (ss/ensure-logged-in-admin state)
+      
+      (let [result (->> (ss/perform-get-seminar state {})
+                        (sort-by :seminar_id))
+            
+            data {:title "Order Seminar"
+                  :add-css ["bower_components/jquery-form-validator/src/theme-default.css"]
+                  :add-js ["bower_components/jquery-form-validator/form-validator/jquery.form-validator.min.js"
+                           "js/module/order-seminar.js"]
+                  :listSeminar result}]
+        
+        (layout/render "order-seminar.html" data))
+      
+      (catch Throwable e
+        (log/debug "Error List Seminar" (pr-str (.getMessage e))))
+      (finally
+        (sw/give-worker "seminar" state)))))
+
+
+(defn get-list-member
+  [ctx]
+  (when-let [state (sw/take-worker "seminar")]
+    (try
+      (ss/ensure-logged-in-admin state)
+      
+      (let [result  (->> (ss/perform-get-member state {})
+                         (sort-by :member_id))
+            _ (log/debug "RESULT" (pr-str result))
+            _ (when (not-empty result)
+                (save-member-db result))
+            
+            data {:title "List Member"
+                  :listMember result}]
+        
+        (layout/render "list-member.html" data))
+      
+      (catch Throwable e
+        (log/debug "Error List Member" (pr-str (.getMessage e))))
+      (finally
+        (sw/give-worker "seminar" state)))))
+
+
+(defn view-history-order
+  [ctx]
+  (layout/render "history-order.html"
+                 {:title "History Order"
+                  :add-css ["bower_components/jquery-form-validator/src/theme-default.css"]
+                  :add-js ["bower_components/jquery-form-validator/form-validator/jquery.form-validator.min.js"
+                           "js/module/history-order-seminar.js"]}))
+
 
 (defn cetak-ticket
   [order-id]

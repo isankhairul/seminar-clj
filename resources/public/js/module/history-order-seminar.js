@@ -7,11 +7,6 @@ $('#formSearchOrder').on('submit', function(event){
     event.preventDefault();
 
     var email = $('#email').val();
-    if ( !validateEmail(email) ){
-        alert('Please input emails.');   
-        return false; 
-    }
-
     $.ajax({
         type: "POST",
         dataType: "html",

@@ -147,6 +147,8 @@
         cookie-map (merge cookie-map (u/get-cookie headers))
 
         register-member-param (sp/create-register-member-param params)
+
+        _ (log/debug "REGISTER-MEMBER" (pr-str register-member-param))
         
         {:keys [status headers body error] :as resp}
         (api-action :post (:submit-register-member urls)
@@ -172,13 +174,12 @@
                               (:message parse-alert))
                         error-message)
         success-message (when (= "success" (:alertType parse-alert))
-                          (:message parse-alert))
-        ]
+                          (:message parse-alert))]
+    
     {:cookies cookie-map
      :resp resp
      :errorMessage error-message
-     :successMessage success-message}
-    ))
+     :successMessage success-message}))
 
 (defn perform-action-actual-order-seminar
   [state params]
@@ -274,7 +275,9 @@
 
 (defn perform-register-member
   [params]
-  (perform-action-actual-register-member params))
+  (-> (perform-action-actual-register-member params)
+      (dissoc :resp)
+      (dissoc :cookies)))
 
 (defn perform-order-seminar
   [state params]
