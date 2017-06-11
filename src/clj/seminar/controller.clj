@@ -8,6 +8,14 @@
             [clojure.java.io :as io]
             [clojure.string :as s]))
 
+(defn view-register
+  [ctx]
+  (layout/render "register-member.html"
+                 {:title "Register Member"
+                  :add-css ["bower_components/jquery-form-validator/src/theme-default.css"]
+                  :add-js ["js/global-helper.js"
+                           "bower_components/jquery-form-validator/form-validator/jquery.form-validator.min.js"
+                           "js/module/register-member.js"]}))
 
 (defn save-member-db
   [list-member]
@@ -23,9 +31,9 @@
                       :dob (:dob member)
                       :phone (:phone member)
                       :status (:status member))]
-         (if (empty? (model/-check-table
+         (if (empty? (model/check-table
                         "member" {:member_id (:member_id member)}))
-           (model/-insert-table "member" data-db))))
+           (model/insert-table "member" data-db))))
      
      list-member)))
 
@@ -38,11 +46,11 @@
       (let [result (->> (ss/perform-get-seminar state {})
                         (sort-by :seminar_id))
             
-            add-js ["js/global-helper.js"
-                    "js/module/order-seminar.js"]
-            
             data {:title "Order Seminar"
-                  :add-js add-js
+                  :add-css ["bower_components/jquery-form-validator/src/theme-default.css"]
+                  :add-js ["js/global-helper.js"
+                           "bower_components/jquery-form-validator/form-validator/jquery.form-validator.min.js"
+                           "js/module/order-seminar.js"]
                   :listSeminar result}]
         
         (layout/render "order-seminar.html" data))
@@ -109,7 +117,7 @@
                                       :serial (:serial peserta))]
                          (log/debug "DATA-DB" data-db)
                          ;;save to db
-                         (model/-insert-table "seminar_order" data-db)
+                         (model/insert-table "order_seminar" data-db)
                          
                          [(:serial peserta)]))
 
@@ -127,7 +135,9 @@
   [ctx]
   (layout/render "history-order.html"
                  {:title "History Order"
+                  :add-css ["bower_components/jquery-form-validator/src/theme-default.css"]
                   :add-js ["js/global-helper.js"
+                           "bower_components/jquery-form-validator/form-validator/jquery.form-validator.min.js"
                            "js/module/history-order-seminar.js"]}))
 
 (defn get-history-order

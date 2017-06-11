@@ -34,31 +34,11 @@
     :status 1,
     :link_peserta "List Peserta",
     :tema "IT Security",
-    :no "3"}
-   {:sisa_kuota "50",
-    :pembicara "Harianto",
-    :kuota "50",
-    :seminar_id "4",
-    :tempat "Auditorium Mercu Buana",
-    :jadwal "2017-07-20 09:00:00",
-    :status 1,
-    :link_peserta nil,
-    :tema "Mobile Application",
-    :no "2"}
-   {:sisa_kuota "97",
-    :pembicara "Ibnu Sina",
-    :kuota "100",
-    :seminar_id "5",
-    :tempat "Auditorium Mercu Buana",
-    :jadwal "2017-06-10 21:50:00",
-    :status 1,
-    :link_peserta "List Peserta",
-    :tema "Smart City",
-    :no "1"}])
+    :no "3"}])
 
 (defroutes home-routes
   (GET "/" [] (home-page))
-  (GET "/register-member" [] (layout/render "register-member.html"))
+  (GET "/register-member" ctx (controller/view-register ctx))
   (GET "/list-member" ctx (controller/get-list-member ctx))
   (GET "/list-seminar" ctx (controller/get-list-seminar ctx))
   (GET "/history-order" ctx (controller/view-history-order ctx))

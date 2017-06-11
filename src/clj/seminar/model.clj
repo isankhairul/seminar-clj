@@ -27,44 +27,45 @@
             :port "3306"}))
 
 (defentity seminar
-  (pk :seminar_id))
+  (pk :seminar_id)
+  (table :seminar))
 
 (defentity member
-  (pk :member_id))
+  (pk :member_id)
+  (table :member))
 
-(defentity seminar_order
-  (pk :orderId)
-  (has-one seminar :seminar_id)
-  (has-one member :member_id))
+(defentity order_seminar
+  (pk :order_id)
+  (table :order_seminar)
+  (belongs-to seminar {:fk :seminar_id})
+  (belongs-to member {:fk :member_id}))
 
-(defn -select-table
+(defn select-table
   [tm ]
   (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
     (select tm)))
 
-(defn -check-table
+(defn check-table
   [tm p-where]
   (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
     (select tm
             (where p-where))))
 
-(defn -insert-table
+(defn insert-table
   [tm m]
   (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
-    (insert tm (values m))))
+    (transaction
+     (insert tm (values m)))))
 
-(defn -update-table
+(defn update-table
   [tm p-fields p-where]
   (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
-    (update tm
-            (set-fields p-fields)
-            (where p-where))))
+    (transaction
+     (update tm
+              (set-fields p-fields)
+              (where p-where)))))
 
-(defn -delete-table
-  [tm p-fields p-where]
-  (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
-    (update tm
-            (set-fields p-fields)
-            (where p-where))))
-
-
+(defn get-order-seminar []
+  (select order_seminar
+          (with seminar)
+          (with member)))

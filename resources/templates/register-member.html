@@ -11,59 +11,59 @@
             <h3>Register Member</h3>
             <hr class="mt-2 mb-2">
         </div>
-        <form> 
-        <!--Body-->
-        <div class="md-form">
-            <input type="email" name="email" id="email" class="form-control validate" required>
-            <label for="email" data-error="input_valid_email">Email</label>
-        </div>
-
-        <div class="md-form">
-            <input type="password" name="password" id="password" required class="form-control">
-            <label for="password">Password</label>
-        </div>
-
-        <div class="md-form">
-            <input type="text" name="firstname" id="firstname"  required class="form-control">
-            <label for="firstname">Firstname</label>
-        </div>
-
-        <div class="md-form">
-            <input type="text" name="lastname" id="lastname" required class="form-control">
-            <label for="lastname">Lastname</label>
-        </div>
-
-        <div class="md-form">
-            <input type="number" name="phone" id="phone" class="form-control validate">
-            <label for="phone" data-error="input_number" data-success="">Phone</label>
-        </div>
-
-        <div class="md-form">
-            <select class="mdb-select">
-                <option value="" disabled selected>Choose your option</option>
-                <option value="L">Laki-Laki</option>
-                <option value="P">Perempuan</option>
-            </select>
-            <label for="gender">Gender</label>
-        </div>
-
-        <div class="md-form">
-            <input type="text" name="dob" id="dob" class="form-control datepicker">
-            <label for="dob">Date of birth</label>
-        </div>
-        <div class="file-field">
-            <div class="btn btn-primary btn-sm">
-                <span>Choose file</span>
-                <input type="file" name="photo">
+        <form id="formRegisterMember"> 
+            <!--Body-->
+            <div class="md-form">
+                <input type="email" name="email" id="email" class="form-control" data-validation="required,email">
+                <label for="email">Email</label>
             </div>
-            <div class="file-path-wrapper">
-            <input class="file-path validate" type="text" placeholder="Photo">
+
+            <div class="md-form">
+                <input type="password" name="password" id="password" data-validation="required,length" data-validation-length="min6" class="form-control">
+                <label for="password">Password</label>
             </div>
-        </div>
-        <br/><br/>
-        <div class="text-center">
-            <button type="button" id="signup" class="btn warning-color-dark waves-effect waves-light">Sign Up</button>
-        </div>
+
+            <div class="md-form">
+                <input type="text" name="firstname" id="firstname" data-validation="required,custom" data-validation-regexp="^([a-zA-Z]+)$" class="form-control">
+                <label for="firstname">Firstname</label>
+            </div>
+
+            <div class="md-form">
+                <input type="text" name="lastname" id="lastname" data-validation="required,custom" data-validation-regexp="^([a-zA-Z]+)$" class="form-control">
+                <label for="lastname">Lastname</label>
+            </div>
+
+            <div class="md-form">
+                <input type="number" name="phone" id="phone" data-validation="required,number,length" data-validation-length="min12" class="form-control">
+                <label for="phone" data-success="">Phone</label>
+            </div>
+
+            <div class="md-form">
+                <select class="mdb-select" data-validation="required">
+                    <option value="" disabled selected>Choose your option</option>
+                    <option value="L">Laki-Laki</option>
+                    <option value="P">Perempuan</option>
+                </select>
+                <label for="gender">Gender</label>
+            </div>
+
+            <div class="md-form">
+                <input type="text" name="dob" id="dob" data-validation="required" class="form-control datepicker">
+                <label for="dob">Date of birth</label>
+            </div>
+            <div class="file-field">
+                <div class="btn btn-primary btn-sm">
+                    <span>Choose file</span>
+                    <input type="file" name="photo">
+                </div>
+                <div class="file-path-wrapper">
+                <input class="file-path validate" type="text" placeholder="Photo">
+                </div>
+            </div>
+            <br/><br/>
+            <div class="text-center">
+                <button type="submit" id="signup" class="btn warning-color-dark waves-effect waves-light">Sign Up</button>
+            </div>
         </form>
 
     </div>
@@ -112,22 +112,4 @@
 </div>
 <!-- Central Modal Medium Info-->
 <!--/Form without header-->
-{% endblock %}
-
-{% block page-scripts %}
-<script>
- $(document).ready(function() {
-    $('.mdb-select').material_select();
-    // Data Picker Initialization
-    $('.datepicker').pickadate({
-        selectYears: 100,
-        max: true,
-        formatSubmit: 'yyyy-mm-dd'
-    });
-
-    $('#signup').on('click', function(){
-        $('#modalSignup').modal({backdrop: 'static'});
-    });
-});
-</script>
 {% endblock %}

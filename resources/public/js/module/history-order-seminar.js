@@ -1,7 +1,11 @@
 $(document).ready(function(){
+$.validate({
+    form : '#formSearchOrder'
+});
 
+$('#formSearchOrder').on('submit', function(event){
+    event.preventDefault();
 
-$('#searchOrder').on('click', function(){
     var email = $('#email').val();
     if ( !validateEmail(email) ){
         alert('Please input emails.');   

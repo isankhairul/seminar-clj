@@ -29,16 +29,15 @@
                (tl/local-now))
           
           subject (str "Email notification updated seminar " now)
-          html-email (selmer.parser/render-file "email-notif.html" {:listSeminar rs-compare})
-          ]
+          html-email (selmer.parser/render-file "email-notif.html" {:listSeminar rs-compare})]
+      
       (pc/send-message
        config-smtp
        {:from (str "noreply seminar <" smtp-user ">")
         :to "isankhairul@gmail.com"
         :subject subject
         :body [{:type "text/html"
-                :content html-email}]})
-      )))
+                :content html-email}]}))))
 
 
 (defn save-data-seminar
@@ -62,9 +61,9 @@
                   
                   data-update (assoc data-seminar-db :modified_date now)]
               
-              (if (empty? (model/-check-table "seminar" where))
-                (model/-insert-table "seminar" data-seminar-db)
-                (model/-update-table "seminar" data-update  where))))
+              (if (empty? (model/check-table "seminar" where))
+                (model/insert-table "seminar" data-seminar-db)
+                (model/update-table "seminar" data-update  where))))
           
      list-seminar)))
 
@@ -74,7 +73,7 @@
     (try
       (ss/ensure-logged-in-admin state)
       
-      (let [data-seminar-db  (model/-select-table "seminar")
+      (let [data-seminar-db  (model/select-table "seminar")
             data-seminar-scraping (->> (ss/perform-get-seminar state {})
                                        (sort-by :seminar_id))
             
@@ -95,13 +94,16 @@
                                                             data-seminar-db)
                                               (assoc scraping :keterangan "Seminar Baru"))))
                                         (distinct)
-                                        (remove nil?))) 
-            ]
+                                        (remove nil?)))]
+        
         (log/debug "COMPARE-DATA-SEMINAR" (pr-str compare-data-seminar))
         (save-data-seminar compare-data-seminar)
 
-        ;;result
-        (handler-notification-seminar compare-data-seminar))
+        ;;send mail notification
+        (when (not-empty compare-data-seminar)
+          (handler-notification-seminar compare-data-seminar))
+
+        compare-data-seminar)
       
       (catch Throwable e
         (log/debug "Error Handler scheduler check seminar" (pr-str (.getMessage e))))

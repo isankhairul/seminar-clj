@@ -9,14 +9,14 @@
             <h3>History Order</h3>
         </div>
         <hr class="mt-2 mb-2">
-        <form>
+        <form id="formSearchOrder">
             <!--Body-->
             <div class="md-form">
-                <input type="email" name="email" id="email" class="form-control validate" required>
-                <label for="email" data-error="input_valid_email">Email</label>
+                <input type="email" name="email" id="email" class="form-control" data-validation="required,email">
+                <label for="email">Email</label>
             </div>
             <div class="text-left">
-                <button type="button" id="searchOrder" class="btn warning-color-dark waves-effect waves-light">
+                <button type="submit" id="searchOrder" class="btn warning-color-dark waves-effect waves-light">
                     <i class="fa fa-search" aria-hidden="true"></i>
                     Search
                 </button>
