@@ -42,9 +42,11 @@
                 {% endif %}
             </td>
             <td>
+            {% if item.status = 1 %}
                 <button type="button" class="btn btn-order warning-color-dark waves-effect">
                     Order
                 </button>
+            {% endif %}
             </td>
         </tr>
         {% endfor %}

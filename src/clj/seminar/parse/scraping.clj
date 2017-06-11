@@ -1,5 +1,6 @@
 (ns seminar.parse.scraping
   (:require [clojure.tools.logging :as log]
+            [seminar.util :as u]
             [clojure
              [zip :as zip]
              [string :as s]]
@@ -78,11 +79,13 @@
                               (= :linkPeserta key) (-> content :attrs :href)
                               (= :status key) (if (= "active" (-> content :content first s/lower-case))
                                                 1 0)
+                              (#{:kuota :sisa_kuota} key) (u/string->number content)
                               (> count-content 1) (some->> tag-td
                                                            (hs/select
                                                             (hs/tag :a))
                                                            last
-                                                           :attrs :id_delete_seminar)
+                                                           :attrs :id_delete_seminar
+                                                           (u/string->number))
                               (-> content :content first boolean) (-> content :content first)
                               :else content)]
                 [key content]))
@@ -129,7 +132,8 @@
                                                            (hs/select
                                                             (hs/tag :a))
                                                            last
-                                                           :attrs :member_id)
+                                                           :attrs :member_id
+                                                           (u/string->number))
                               (-> content :content first boolean) (-> content :content first)
                               :else content)]
                 [key content]))
@@ -178,7 +182,8 @@
                                                         (hs/tag :a) tag-td)
                                                        last :attrs :href str
                                                        (s/split #"\/")
-                                                       last)
+                                                       last
+                                                       (u/string->number))
                               (-> content :content first boolean) (-> content :content first)
                               :else content)]
                 [key content]))

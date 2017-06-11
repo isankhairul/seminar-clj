@@ -37,6 +37,17 @@
   (has-one seminar :seminar_id)
   (has-one member :member_id))
 
+(defn -select-table
+  [tm ]
+  (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
+    (select tm)))
+
+(defn -check-table
+  [tm p-where]
+  (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
+    (select tm
+            (where p-where))))
+
 (defn -insert-table
   [tm m]
   (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
@@ -56,8 +67,4 @@
             (set-fields p-fields)
             (where p-where))))
 
-(defn -check-table
-  [tm p-where]
-  (let [tm (->> tm (symbol) (ns-resolve 'seminar.model) deref)]
-    (select tm
-            (where p-where))))
+

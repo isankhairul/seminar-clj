@@ -4,6 +4,13 @@
   (:gen-class))
 
 
+(defn string->number [str]
+  (try
+    (if (string? str)
+      (read-string str)
+      str)
+    (catch Throwable e
+      str)))
 
 (defn get-cookie [headers]
   (some-> headers

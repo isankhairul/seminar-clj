@@ -7,6 +7,7 @@
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.tools.logging :as log]
             [mount.core :as mount]
+            [seminar.background_services :as bgservices]
             [seminar.worker_pool :as sw])
   (:gen-class))
 
@@ -53,5 +54,6 @@
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop-app)))
 
 (defn -main [& args]
-  (sw/initialize-all-default-workers 20)
+  (sw/initialize-all-default-workers 30)
+  (bgservices/scheduler-check-seminar)
   (start-app args))

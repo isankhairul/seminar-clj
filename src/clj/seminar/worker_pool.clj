@@ -36,7 +36,9 @@
 
 (defn take-worker
   [name & [t]]
-  (take-worker* name worker-pool t))
+  (let [worker (take-worker* name worker-pool 5)]
+    (assert worker (str "No worker for " name))
+    worker))
 
 (defn give-worker
   [name worker]

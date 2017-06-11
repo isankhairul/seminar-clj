@@ -155,8 +155,8 @@
                                 (mapv (fn [idx peserta]
                                         (assoc peserta :no (inc idx)))
                                       (range)))]
-        (log/debug "list-seminar-with-peserta" (pr-str list-seminar-with-peserta))
-        (log/debug "merge-seminar-peserta" (pr-str merge-seminar-peserta))
+        ;;(log/debug "list-seminar-with-peserta" (pr-str list-seminar-with-peserta))
+        ;;(log/debug "merge-seminar-peserta" (pr-str merge-seminar-peserta))
         
         (selmer.parser/render-file "result-search-history-order.html"
                                    {:listPeserta filter-peserta}))

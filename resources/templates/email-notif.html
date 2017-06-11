@@ -1,0 +1,26 @@
+<p style="color:#153643; font-family: Arial, sans-serif; font-size: 24px;">
+    <strong>Email notification updated seminar<strong>
+</p>
+<br/>
+<table rules="all" style="border-color: #666; font-family: Arial, sans-serif;" cellpadding="10">
+    <tr style='background: #eee;'>
+        <td><strong>Tema</strong> 
+        <td><strong>Jadwal</strong>
+        <td><strong>Pembicara</strong>
+        <td><strong>Tempat</strong>
+        <td><strong>Kuota</strong>
+        <td><strong>Sisa Kuota</strong>
+        <td><strong>Keterangan</strong>
+    </tr>
+    {% for item in listSeminar %}
+    <tr>
+       <td>{{item.tema}}</td>
+       <td>{{item.jadwal}}</td>
+       <td>{{item.pembicara}}</td>
+       <td>{{item.tempat}}</td>
+       <td>{{item.kuota}}</td>
+       <td>{{item.sisa_kuota}}</td>
+       <td>{{item.keterangan}}</td>
+    </tr>
+    {% endfor %}
+</table>
