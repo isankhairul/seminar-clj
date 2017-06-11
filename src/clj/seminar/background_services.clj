@@ -69,6 +69,7 @@
      list-seminar)))
 
 (defn handler-scheduler-check-seminar []
+  (log/debug "running scheduler-check-seminar...")
   (when-let [state (sw/take-worker "seminar-scheduler")]
     (try
       (ss/ensure-logged-in-admin state)
@@ -121,8 +122,8 @@
                                     false :default :keep-going)]
             (if v
               (do (async/<!! (async/timeout timeout-value))
-                  (log/debug "running scheduler-check-seminar...")
                   (handler-scheduler-check-seminar)
                   (recur))
               (do (log/debug "Exitting scheduler loop..."))))))
-    ))
+    
+    (println "initializing scheduler-check-seminar")))
